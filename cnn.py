@@ -21,9 +21,9 @@ def create_training_data():
                 pass
 
 
-IMG_SIZE = 50
+IMG_SIZE = 100
 CATEGORIES = ['O', 'R']
-if not os.path.exists('X.pkl'):
+if not os.path.exists('X.pkl') or not os.path.exists('y.pkl'):
     # create the data set
     ORIGDIR = os.getcwd()
     DATADIR = os.path.join(ORIGDIR, 'TRAIN')  # MOVE INTO THE TRAIN FOLDER
@@ -39,6 +39,7 @@ if not os.path.exists('X.pkl'):
         y.append(label)
 
     X = np.array(X).reshape(-1, IMG_SIZE, IMG_SIZE, 1)
+    X = np.true_divide(X, 255)
     y = np.array(y)
     os.chdir(ORIGDIR)
     with open('X.pkl', 'wb') as file:
@@ -46,26 +47,28 @@ if not os.path.exists('X.pkl'):
     with open('y.pkl', 'wb') as file:
         pickle.dump(y, file)
 
-with open('X.pkl', 'rb') as file:
-    X = pickle.load(file)
-    X = np.true_divide(X, 255)
-with open('y.pkl', 'rb') as file:
-    y = pickle.load(file)
+else:
+    with open('X.pkl', 'rb') as file:
+        X = pickle.load(file)
+
+    with open('y.pkl', 'rb') as file:
+        y = pickle.load(file)
 
 # tf.config.list_physical_devices('GPU')
 
 model = keras.Sequential([
-                   Conv2D(filters=32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(X.shape[1:])),
-                   MaxPooling2D(pool_size=(2, 2), strides=2),
+                   Conv2D(filters=64, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(X.shape[1:])),
+                   #MaxPooling2D(pool_size=(2, 2), strides=2),
                    Conv2D(filters=64, kernel_size=(3, 3), activation='relu', padding='same'),
-                   MaxPooling2D(pool_size=(2, 2), strides=2),
+                   #MaxPooling2D(pool_size=(2, 2), strides=2),
                    Conv2D(filters=64, kernel_size=(3, 3), activation='relu', padding='same'),
-                   MaxPooling2D(pool_size=(2, 2), strides=2),
+                   #MaxPooling2D(pool_size=(2, 2), strides=2),
                    Flatten(),
-                   Dense(units=1, activation='softmax')
+                   Dense(units=1, activation='sigmoid')
 ])
 
 model.summary()
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-model.fit(X, y, epochs=10, verbose=2)
+model.fit(X, y, epochs=5, verbose=2)
+model.save('organics_and_recyclables.model')
