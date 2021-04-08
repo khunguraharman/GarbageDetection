@@ -1,3 +1,3 @@
 # DESCRIPTION
 
-This branch simply tries to categorize waste as one of 12 categories.
+This branch simply tries to categorize waste as either aluminum cans or glass bottles
