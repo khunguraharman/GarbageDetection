@@ -1,3 +1,3 @@
 # DESCRIPTION
 
-This branch simply provides the backup for the working model.
+This branch simply tries to categorize waste as one of 12 categories.
